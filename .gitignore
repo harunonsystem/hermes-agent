@@ -37,3 +37,4 @@ cron/output/
 
 # OS
 .DS_Store
+.sync.log
