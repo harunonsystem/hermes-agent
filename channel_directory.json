@@ -1,0 +1,60 @@
+{
+  "updated_at": "2026-04-07T05:00:17.346469",
+  "platforms": {
+    "discord": [
+      {
+        "id": "1490673054378889431",
+        "name": "一般",
+        "guild": "harunonai",
+        "type": "channel"
+      },
+      {
+        "id": "1490675621171298564",
+        "name": "hermes",
+        "guild": "harunonai",
+        "type": "channel"
+      },
+      {
+        "id": "1490794535180173383:1490794535180173383",
+        "name": "harunonai / #hermes / おはよ / topic 1490794535180173383",
+        "type": "thread",
+        "thread_id": "1490794535180173383"
+      },
+      {
+        "id": "1490795400079347723:1490795400079347723",
+        "name": "harunonai / #hermes / a / topic 1490795400079347723",
+        "type": "thread",
+        "thread_id": "1490795400079347723"
+      },
+      {
+        "id": "1490796194207764633:1490796194207764633",
+        "name": "harunonai / #hermes / /status / topic 1490796194207764633",
+        "type": "thread",
+        "thread_id": "1490796194207764633"
+      },
+      {
+        "id": "1490796782819475688:1490796782819475688",
+        "name": "harunonai / #hermes / おはよ / topic 1490796782819475688",
+        "type": "thread",
+        "thread_id": "1490796782819475688"
+      },
+      {
+        "id": "1490797111736795136:1490797111736795136",
+        "name": "harunonai / #hermes / a / topic 1490797111736795136",
+        "type": "thread",
+        "thread_id": "1490797111736795136"
+      },
+      {
+        "id": "1490798733535871079:1490798733535871079",
+        "name": "harunonai / #hermes / RSS取得して、10文字以上ある投稿を全て探してこの人の人格となるものをまとめて記憶してmisskey.io/@harunon.atomharunon... / topic 1490798733535871079",
+        "type": "thread",
+        "thread_id": "1490798733535871079"
+      }
+    ],
+    "telegram": [],
+    "whatsapp": [],
+    "signal": [],
+    "email": [],
+    "sms": []
+  }
+}

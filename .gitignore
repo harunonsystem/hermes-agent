@@ -1,0 +1,39 @@
+# Secrets
+.env
+auth.json
+auth.lock
+
+# State & DB
+state.db
+state.db-shm
+state.db-wal
+gateway_state.json
+gateway.pid
+
+# Logs
+logs/
+
+# Sessions & cache
+sessions/
+audio_cache/
+image_cache/
+cache/
+sandboxes/
+
+# Runtime
+hermes-agent/
+venv/
+node_modules/
+
+# Pairing & messaging state
+pairing/
+whatsapp/
+
+# Memories (personal data)
+memories/
+
+# Cron output
+cron/output/
+
+# OS
+.DS_Store
