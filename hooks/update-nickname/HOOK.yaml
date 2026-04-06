@@ -1,0 +1,4 @@
+name: update-nickname
+description: Update Discord bot nickname with current model name after /model command
+events:
+  - command:model
