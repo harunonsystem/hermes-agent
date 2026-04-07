@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-04-07T05:50:20.648369",
+  "updated_at": "2026-04-07T23:53:54.117513",
   "platforms": {
     "discord": [
       {
@@ -49,6 +49,18 @@
         "name": "harunonai / #hermes / RSS取得して、10文字以上ある投稿を全て探してこの人の人格となるものをまとめて記憶してmisskey.io/@harunon.atomharunon... / topic 1490798733535871079",
         "type": "thread",
         "thread_id": "1490798733535871079"
+      },
+      {
+        "id": "1490846830001655939:1490846830001655939",
+        "name": "harunonai / #hermes / おは / topic 1490846830001655939",
+        "type": "thread",
+        "thread_id": "1490846830001655939"
+      },
+      {
+        "id": "1491039745978142730:1491039745978142730",
+        "name": "harunonai / #hermes / DESIGN.md 作りたい（Google提唱なので自分で調べて）んだけど、FigmaUIが再現できるほどのそれを作るには何が必要？どういうディレクトリ構... / topic 1491039745978142730",
+        "type": "thread",
+        "thread_id": "1491039745978142730"
       }
     ],
     "telegram": [],
