@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-04-07T23:53:54.117513",
+  "updated_at": "2026-04-08T23:54:25.703605",
   "platforms": {
     "discord": [
       {
@@ -11,6 +11,12 @@
       {
         "id": "1490675621171298564",
         "name": "hermes",
+        "guild": "harunonai",
+        "type": "channel"
+      },
+      {
+        "id": "1491434047564419193",
+        "name": "news",
         "guild": "harunonai",
         "type": "channel"
       },
@@ -61,6 +67,24 @@
         "name": "harunonai / #hermes / DESIGN.md 作りたい（Google提唱なので自分で調べて）んだけど、FigmaUIが再現できるほどのそれを作るには何が必要？どういうディレクトリ構... / topic 1491039745978142730",
         "type": "thread",
         "thread_id": "1491039745978142730"
+      },
+      {
+        "id": "1491421910041624636:1491421910041624636",
+        "name": "harunonai / #hermes / https://stitch.withgoogle.com/docs/design-md/overviewこれは何 / topic 1491421910041624636",
+        "type": "thread",
+        "thread_id": "1491421910041624636"
+      },
+      {
+        "id": "1491433726817865740:1491433726817865740",
+        "name": "harunonai / #hermes / AI x デザイン（figma, claude, pencil.dev, stitchとか）のアプリ開発をしているエンジニア・デザイナーに必要な情報をピ... / topic 1491433726817865740",
+        "type": "thread",
+        "thread_id": "1491433726817865740"
+      },
+      {
+        "id": "1491434358001897654:1491434358001897654",
+        "name": "harunonai / #hermes / hermes の情報とかIssueとかXの投稿を探して、みんながHERMESで何してるのか教えてハイブランドのエルメスでないことに注意 / topic 1491434358001897654",
+        "type": "thread",
+        "thread_id": "1491434358001897654"
       }
     ],
     "telegram": [],
