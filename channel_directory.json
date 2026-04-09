@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-04-08T23:54:25.703605",
+  "updated_at": "2026-04-09T23:23:15.823960",
   "platforms": {
     "discord": [
       {
@@ -85,6 +85,12 @@
         "name": "harunonai / #hermes / hermes の情報とかIssueとかXの投稿を探して、みんながHERMESで何してるのか教えてハイブランドのエルメスでないことに注意 / topic 1491434358001897654",
         "type": "thread",
         "thread_id": "1491434358001897654"
+      },
+      {
+        "id": "1491590767955673189:1491590767955673189",
+        "name": "harunonai / #hermes / おはよ / topic 1491590767955673189",
+        "type": "thread",
+        "thread_id": "1491590767955673189"
       }
     ],
     "telegram": [],

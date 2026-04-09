@@ -1,11 +1,71 @@
 model:
-  default: openai/gpt-4o-mini
-  provider: openrouter
-  base_url: https://openrouter.ai/api/v1
+  default: gemma4:latest
+  provider: custom
+  base_url: http://localhost:11434/v1
   api_mode: chat_completions
-  name: openai/gpt-4o-mini
+  name: gemma4:latest
+  context_length: 32768
 providers: {}
 fallback_providers: []
+
+# ── Custom Providers ─────────────────────────────────────────────────
+custom_providers:
+  - name: ollama
+    base_url: http://localhost:11434/v1
+
+# ── Model Aliases ────────────────────────────────────────────────────
+# /model <alias> でサクッと切り替え可能
+model_aliases:
+  # ── Ollama Local ──
+  gemma4:
+    model: "gemma4:latest"
+    provider: custom
+    base_url: "http://localhost:11434/v1"
+  gemma4-26b:
+    model: "gemma4:26b"
+    provider: custom
+    base_url: "http://localhost:11434/v1"
+  # ── OpenRouter Free ──
+  hermes-405b:
+    model: "nousresearch/hermes-3-llama-3.1-405b:free"
+    provider: openrouter
+    base_url: "https://openrouter.ai/api/v1"
+  qwen3-coder:
+    model: "qwen/qwen3-coder:free"
+    provider: openrouter
+    base_url: "https://openrouter.ai/api/v1"
+  qwen3-next:
+    model: "qwen/qwen3-next-80b-a3b-instruct:free"
+    provider: openrouter
+    base_url: "https://openrouter.ai/api/v1"
+  llama-70b:
+    model: "meta-llama/llama-3.3-70b-instruct:free"
+    provider: openrouter
+    base_url: "https://openrouter.ai/api/v1"
+  nemotron-120b:
+    model: "nvidia/nemotron-3-super-120b-a12b:free"
+    provider: openrouter
+    base_url: "https://openrouter.ai/api/v1"
+  gpt-oss-120b:
+    model: "openai/gpt-oss-120b:free"
+    provider: openrouter
+    base_url: "https://openrouter.ai/api/v1"
+  gemma3-27b:
+    model: "google/gemma-3-27b-it:free"
+    provider: openrouter
+    base_url: "https://openrouter.ai/api/v1"
+  gemma4-or:
+    model: "google/gemma-4-31b-it:free"
+    provider: openrouter
+    base_url: "https://openrouter.ai/api/v1"
+  glm-4.5:
+    model: "z-ai/glm-4.5-air:free"
+    provider: openrouter
+    base_url: "https://openrouter.ai/api/v1"
+  minimax:
+    model: "minimax/minimax-m2.5:free"
+    provider: openrouter
+    base_url: "https://openrouter.ai/api/v1"
 credential_pool_strategies:
   openrouter: fill_first
 toolsets:
