@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-04-11T23:56:59.824245",
+  "updated_at": "2026-04-12T23:57:56.133647",
   "platforms": {
     "discord": [
       {
@@ -133,6 +133,18 @@
         "name": "harunonai / #hermes / model切り替えとか特定のモデルで喋るのを固定したいんだけど何ができそう？このchではこのモデルみたいな切り分けがしたい / topic 1492510460019212481",
         "type": "thread",
         "thread_id": "1492510460019212481"
+      },
+      {
+        "id": "1492769778559877291:1492769778559877291",
+        "name": "harunonai / #hermes / 六本木一丁目駅から第３５興和ビルまでコンビニある？近くにあるとしたらどこが一番寄り道として近い？ / topic 1492769778559877291",
+        "type": "thread",
+        "thread_id": "1492769778559877291"
+      },
+      {
+        "id": "1492882258351357972:1492882258351357972",
+        "name": "harunonai / #hermes / https://sushegaad.github.io/Claude-Skills-Governance-Risk-and-Compliance/このS... / topic 1492882258351357972",
+        "type": "thread",
+        "thread_id": "1492882258351357972"
       }
     ],
     "telegram": [],
