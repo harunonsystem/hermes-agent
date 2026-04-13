@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-04-12T23:57:56.133647",
+  "updated_at": "2026-04-13T23:57:19.239652",
   "platforms": {
     "discord": [
       {
@@ -145,6 +145,12 @@
         "name": "harunonai / #hermes / https://sushegaad.github.io/Claude-Skills-Governance-Risk-and-Compliance/このS... / topic 1492882258351357972",
         "type": "thread",
         "thread_id": "1492882258351357972"
+      },
+      {
+        "id": "1493246710481424596:1493246710481424596",
+        "name": "harunonai / #hermes / 12x7x12 / topic 1493246710481424596",
+        "type": "thread",
+        "thread_id": "1493246710481424596"
       }
     ],
     "telegram": [],
