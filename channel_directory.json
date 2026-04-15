@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-04-14T23:55:00.057393",
+  "updated_at": "2026-04-15T23:54:15.241107",
   "platforms": {
     "discord": [
       {
@@ -11,12 +11,6 @@
       {
         "id": "1490675621171298564",
         "name": "hermes",
-        "guild": "harunonai",
-        "type": "channel"
-      },
-      {
-        "id": "1491434047564419193",
-        "name": "news",
         "guild": "harunonai",
         "type": "channel"
       },
