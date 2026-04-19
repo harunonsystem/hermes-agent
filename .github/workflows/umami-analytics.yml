@@ -1,0 +1,23 @@
+name: Umami Analytics
+
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        type: string
+        description: Optional message to include in the report
+        required: false
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord webhook
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          curl -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "content": "Umami 分析を実行しますか？\n\n`/analyze umami` で全Webサイトのアクセス解析を実行します。"
+            }'
