@@ -12,21 +12,8 @@ jobs:
   analyze:
     runs-on: ubuntu-latest
     steps:
-      - name: Install 1Password CLI
+      - name: Send Discord message
         run: |
-          curl -sS https://downloads.1password.com/linux/keys/1password-latest.pub | sudo gpg --dearmor -o /usr/share/keyrings/1password-archive-keyring.gpg
-          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/deb jammy main" | sudo tee /etc/apt/sources.list.d/1password.list > /dev/null
-          sudo apt update && sudo apt install -y 1password-cli
-
-      - name: Sign in to 1Password
-        run: |
-          op signin --account ${{ secrets.OP_ACCOUNT }} --service-account ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-
-- name: Get Discord webhook URL and send message
-        run: |
-          WEBHOOK_URL=$(op read "op://harunonpj/HERMES_DISCORD_WEBHOOK/harunonpj" --field url)
-          curl -X POST "$WEBHOOK_URL" \
+          curl -X POST "${{ secrets.DISCORD_WEBHOOK_URL }}" \
             -H "Content-Type: application/json" \
-            -d '{
-              "content": "Umami 分析を実行しますか？\n\n`/analyze umami` で全Webサイトのアクセス解析を実行します。"
-            }'
+            -d '{"content": "Umami 分析を実行しますか？\n\n`/analyze umami` で全Webサイトのアクセス解析を実行します。"}'
