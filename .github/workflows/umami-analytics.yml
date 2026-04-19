@@ -22,9 +22,9 @@ jobs:
         run: |
           op signin --account ${{ secrets.OP_ACCOUNT }} --service-account ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
-      - name: Get Discord webhook URL and send message
+- name: Get Discord webhook URL and send message
         run: |
-          WEBHOOK_URL=$(op read "op://Discord webhook umami-analytics" --field url)
+          WEBHOOK_URL=$(op read "op://harunonpj/HERMES_DISCORD_WEBHOOK/harunonpj" --field url)
           curl -X POST "$WEBHOOK_URL" \
             -H "Content-Type: application/json" \
             -d '{
