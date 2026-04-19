@@ -58,24 +58,40 @@ Check that the following environment variables are set:
 - UMAMI_API_CLIENT_USER_ID
 - UMAMI_API_CLIENT_SECRET
 
-If any are missing, output an error and stop.
+If any are missing, ask the user to add them to ~/.hermes/.env
 
 ### Step 2: Get List of Websites
 
-Make a GET request to `${UMAMI_API_ENDPOINT}/websites` with headers:
-- X-UMAMI-USERID: ${UMAMI_API_CLIENT_USER_ID}
-- X-UMAMI-SECRET: ${UMAMI_API_CLIENT_SECRET}
+```bash
+curl -s "${UMAMI_API_ENDPOINT}/websites" \
+  -H "X-UMAMI-USERID: ${UMAMI_API_CLIENT_USER_ID}" \
+  -H "X-UMAMI-SECRET: ${UMAMI_API_CLIENT_SECRET}"
+```
 
-Parse the JSON response to get an array of websites.
+Save the output to a file for analysis.
 
 ### Step 3: Fetch Statistics for Each Website
 
-For each website, make a GET request to `${UMAMI_API_ENDPOINT}/websites/${websiteId}/stats` with the same headers.
-Optionally, also fetch:
-- Events: `${UMAMI_API_ENDPOINT}/websites/${websiteId}/events`
-- Metrics: `${UMAMI_API_ENDPOINT}/websites/${websiteId}/metrics`
+For stats (last 30 days):
+```bash
+curl -s "${UMAMI_API_ENDPOINT}/websites/${websiteId}/stats?startAt=${30daysAgo}&endAt=${now}" \
+  -H "X-UMAMI-USERID: ${UMAMI_API_CLIENT_USER_ID}" \
+  -H "X-UMAMI-SECRET: ${UMAMI_API_CLIENT_SECRET}"
+```
 
-You can specify a time range (e.g., last 30 days) using query parameters if needed.
+For events:
+```bash
+curl -s "${UMAMI_API_ENDPOINT}/websites/${websiteId}/events?startAt=${30daysAgo}&endAt=${now}" \
+  -H "X-UMAMI-USERID: ${UMAMI_API_CLIENT_USER_ID}" \
+  -H "X-UMAMI-SECRET: ${UMAMI_API_CLIENT_SECRET}"
+```
+
+For metrics:
+```bash
+curl -s "${UMAMI_API_ENDPOINT}/websites/${websiteId}/metrics?startAt=${30daysAgo}&endAt=${now}" \
+  -H "X-UMAMI-USERID: ${UMAMI_API_CLIENT_USER_ID}" \
+  -H "X-UMAMI-SECRET: ${UMAMI_API_CLIENT_SECRET}"
+```
 
 ### Step 4: Analyze Data
 
@@ -87,6 +103,12 @@ Look for:
 - Top performing content
 - Technical issues (e.g., 404 errors from events)
 - Conversion funnel drop-offs
+
+Calculate timestamps for last 30 days using bash:
+```bash
+now=$(date +%s)
+thirtyDaysAgo=$((now - 30 * 24 * 60 * 60 * 1000))
+```
 
 ### Step 5: Generate Output
 
