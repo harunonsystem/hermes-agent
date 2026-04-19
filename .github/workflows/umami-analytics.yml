@@ -13,15 +13,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install 1Password CLI
-        if: runner.os == 'Linux'
         run: |
           curl -sS https://downloads.1password.com/linux/keys/1password-latest.pub | sudo gpg --dearmor -o /usr/share/keyrings/1password-archive-keyring.gpg
           echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/deb jammy main" | sudo tee /etc/apt/sources.list.d/1password.list > /dev/null
           sudo apt update && sudo apt install -y 1password-cli
 
-      - name: Get Discord webhook URL from 1Password
+      - name: Sign in to 1Password
         run: |
-          WEBHOOK_URL=$(op read op://Discord webhook umami-analytics)
+          op signin --account ${{ secrets.OP_ACCOUNT }} --service-account ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+
+      - name: Get Discord webhook URL and send message
+        run: |
+          WEBHOOK_URL=$(op read "op://Discord webhook umami-analytics" --field url)
           curl -X POST "$WEBHOOK_URL" \
             -H "Content-Type: application/json" \
             -d '{
