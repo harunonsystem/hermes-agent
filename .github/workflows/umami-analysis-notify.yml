@@ -1,0 +1,25 @@
+name: Umami Analysis Notify
+
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        type: string
+        description: Optional message to include in the Discord notification
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Send Discord message
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          EXTRA_MESSAGE: ${{ inputs.message }}
+        run: bash scripts/gha/umami-analysis-notify.sh

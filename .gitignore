@@ -9,6 +9,7 @@ state.db-shm
 state.db-wal
 gateway_state.json
 gateway.pid
+channel_directory.json
 
 # Logs
 logs/
@@ -23,7 +24,10 @@ sandboxes/
 # Runtime
 hermes-agent/
 venv/
+.venv/
 node_modules/
+__pycache__/
+*.pyc
 
 # Pairing & messaging state
 pairing/

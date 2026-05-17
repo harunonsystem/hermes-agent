@@ -1,7 +1,7 @@
 ---
 name: umami-analytics
-description: Analyze Umami website data and generate improvement suggestions.
-version: 1.0.0
+description: Umami(セルフホスト型アナリティクス)のサイトデータを分析し、改善提案を生成する。アクセス解析・サイト分析・トラフィック分析の依頼で発火。 Analyze Umami website data and generate improvement suggestions.
+version: 1.1.0
 author: Hermes Agent
 ---
 
@@ -11,12 +11,27 @@ This skill analyzes data from Umami (self-hosted) and provides a summary and imp
 
 ## Trigger
 
-Use this skill when the user asks about:
+Use this skill when the user asks about ANY of the following (English or Japanese):
+
+**English:**
 - "Umami analytics"
 - "umami analysis"
 - "/analyze umami"
-- analyzing website traffic
-- improvement suggestions from analytics data
+- "analyze website traffic"
+- "improvement suggestions from analytics data"
+
+**日本語 (これらのキーワードでも必ず発火):**
+- 「umami」「Umami」「うまみ」(単独でも反応する)
+- 「アナリティクス」「analytics」
+- 「アクセス解析」「アクセス分析」
+- 「サイト分析」「サイトの解析」
+- 「トラフィック分析」「PV分析」
+- 「サイトのアクセス見て」「うちのサイトどう?」
+- 「ブログの数字」「ウェブサイトの数字」
+- 「改善提案」+「サイト/ブログ」の組み合わせ
+- 「/analyze」「/umami」「/traffic」
+
+判定迷ったら発火させる。空振りしてもユーザーに確認すれば済む。
 
 ## Requirements
 
@@ -61,25 +76,36 @@ Check that UMAMI_USERNAME and UMAMI_PASSWORD are available.
 
 ### Step 2: Login to get token
 ```bash
-TOKEN=$(curl -s -X POST "${UMAMI_API_ENDPOINT}/auth/login" \
+login_payload="$(jq -n \
+  --arg username "${UMAMI_USERNAME}" \
+  --arg password "${UMAMI_PASSWORD}" \
+  '{username: $username, password: $password}')"
+
+TOKEN="$(curl --fail-with-body -sSL -X POST "${UMAMI_API_ENDPOINT}/auth/login" \
   -H "Content-Type: application/json" \
-  -d "{\"username\": \"${UMAMI_USERNAME}\", \"password\": \"${UMAMI_PASSWORD}\"}" | jq -r '.token')
-echo "Token: ${TOKEN}"
+  --data "${login_payload}" | jq -r '.token')"
+
+if [ -z "${TOKEN}" ] || [ "${TOKEN}" = "null" ]; then
+  echo "Failed to obtain Umami token" >&2
+  exit 1
+fi
+
+echo "Token obtained"
 ```
 
 ### Step 3: Get all websites
 ```bash
-curl -s "${UMAMI_API_ENDPOINT}/websites" \
+curl -sL "${UMAMI_API_ENDPOINT}/websites" \
   -H "Authorization: Bearer ${TOKEN}"
 ```
 
 ### Step 4: For each website, get stats
 ```bash
 # Get stats (last 30 days)
-now=$(date +%s)
-thirtyDaysAgo=$((now - 30 * 24 * 60 * 60 * 1000))
+nowMs=$(($(date +%s) * 1000))
+thirtyDaysAgo=$((nowMs - 30 * 24 * 60 * 60 * 1000))
 
-curl -s "${UMAMI_API_ENDPOINT}/websites/${websiteId}/stats?startAt=${thirtyDaysAgo}&endAt=$((now * 1000))" \
+curl -sL "${UMAMI_API_ENDPOINT}/websites/${websiteId}/stats?startAt=${thirtyDaysAgo}&endAt=${nowMs}" \
   -H "Authorization: Bearer ${TOKEN}"
 ```
 
@@ -158,8 +184,8 @@ Look for:
 
 Calculate timestamps for last 30 days using bash:
 ```bash
-now=$(date +%s)
-thirtyDaysAgo=$((now - 30 * 24 * 60 * 60 * 1000))
+nowMs=$(($(date +%s) * 1000))
+thirtyDaysAgo=$((nowMs - 30 * 24 * 60 * 60 * 1000))
 ```
 
 ### Step 5: Generate Output

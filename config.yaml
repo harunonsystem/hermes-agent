@@ -1,12 +1,21 @@
 model:
-  default: gemma4:latest
+  default: qwen3.6:27b
   provider: custom
   base_url: http://localhost:11434/v1
   api_mode: chat_completions
-  name: gemma4:26b
-  context_length: 32768
+  name: qwen3.6:27b
+  context_length: 32000
 providers: {}
-fallback_providers: []
+fallback_providers:
+- model: nousresearch/hermes-3-llama-3.1-405b:free
+  provider: openrouter
+  base_url: https://openrouter.ai/api/v1
+- model: qwen/qwen3-next-80b-a3b-instruct:free
+  provider: openrouter
+  base_url: https://openrouter.ai/api/v1
+- model: qwen/qwen3-coder:free
+  provider: openrouter
+  base_url: https://openrouter.ai/api/v1
 custom_providers:
 - name: ollama
   base_url: http://localhost:11434/v1
@@ -64,12 +73,13 @@ credential_pool_strategies:
 toolsets:
 - hermes-cli
 agent:
-  max_turns: 60
+  max_turns: 30
   gateway_timeout: 1800
   tool_use_enforcement: auto
   verbose: false
-  reasoning_effort: medium
+  reasoning_effort: low
   personalities:
+    gyaru: "あなたは元気なギャルのAIアシスタント。常に日本語で、ギャル口調(まじ?やばくない?それなー、いけるいける!)で話す。絵文字は一切使わない。技術用語・コード・コマンドは英語のまま。説明や会話は日本語。簡潔に、まず結論、次に理由。前置きや言い訳なし。ユーザーの言葉を繰り返さない。証拠ベースで判断、推測で動かない。聞かれたことだけやる。"
     helpful: You are a helpful, friendly AI assistant.
     concise: You are a concise assistant. Keep responses brief and to the point.
     technical: You are a technical expert. Provide detailed, accurate technical information.
@@ -142,12 +152,12 @@ checkpoints:
 file_read_max_chars: 100000
 compression:
   enabled: true
-  threshold: 0.5
+  threshold: 0.7
   target_ratio: 0.2
   protect_last_n: 20
-  summary_model: google/gemini-3-flash-preview
-  summary_provider: auto
-  summary_base_url: null
+  summary_model: gemma4:latest
+  summary_provider: custom
+  summary_base_url: http://localhost:11434/v1
 smart_model_routing:
   enabled: false
   max_simple_chars: 160
@@ -162,50 +172,50 @@ auxiliary:
     timeout: 30
     download_timeout: 30
   web_extract:
-    provider: auto
-    model: ''
-    base_url: ''
+    provider: custom
+    model: gemma4:latest
+    base_url: http://localhost:11434/v1
     api_key: ''
     timeout: 360
   compression:
-    provider: auto
-    model: ''
-    base_url: ''
+    provider: custom
+    model: gemma4:latest
+    base_url: http://localhost:11434/v1
     api_key: ''
     timeout: 120
   session_search:
-    provider: auto
-    model: ''
-    base_url: ''
+    provider: custom
+    model: gemma4:latest
+    base_url: http://localhost:11434/v1
     api_key: ''
     timeout: 30
   skills_hub:
-    provider: auto
-    model: ''
-    base_url: ''
+    provider: custom
+    model: gemma4:latest
+    base_url: http://localhost:11434/v1
     api_key: ''
     timeout: 30
   approval:
-    provider: auto
-    model: ''
-    base_url: ''
+    provider: custom
+    model: gemma4:latest
+    base_url: http://localhost:11434/v1
     api_key: ''
     timeout: 30
   mcp:
-    provider: auto
-    model: ''
-    base_url: ''
+    provider: custom
+    model: gemma4:latest
+    base_url: http://localhost:11434/v1
     api_key: ''
     timeout: 30
   flush_memories:
-    provider: auto
-    model: ''
-    base_url: ''
+    provider: custom
+    model: gemma4:latest
+    base_url: http://localhost:11434/v1
     api_key: ''
     timeout: 30
 display:
   compact: false
-  personality: kawaii
+  personality: gyaru
   resume_display: full
   busy_input_mode: interrupt
   bell_on_complete: false
@@ -219,7 +229,7 @@ display:
   tool_progress: all
   background_process_notifications: all
 privacy:
-  redact_pii: false
+  redact_pii: true
 tts:
   provider: edge
   edge:
@@ -294,7 +304,7 @@ security:
   tirith_enabled: true
   tirith_path: tirith
   tirith_timeout: 5
-  tirith_fail_open: true
+  tirith_fail_open: false
   website_blocklist:
     enabled: false
     domains: []
@@ -312,7 +322,7 @@ session_reset:
   at_hour: 4
 group_sessions_per_user: true
 streaming:
-  enabled: false
+  enabled: true
 platform_toolsets:
   cli:
   - hermes-cli
