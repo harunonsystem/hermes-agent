@@ -108,6 +108,48 @@ BRAILLE_MAP = {
 }
 
 # ═══════════════════════════════════════════════════════════════════
+# Shared transform helpers (used by ~13 obfuscation techniques)
+# ═══════════════════════════════════════════════════════════════════
+
+def _codepoint_shift(word, *, lo, hi, base, sep='', lowercase=True):
+    out = []
+    for c in word:
+        code = ord(c.lower() if lowercase else c)
+        if lo <= code <= hi:
+            out.append(chr(base + code - lo))
+        else:
+            out.append(c)
+    return sep.join(out)
+
+def _table_lookup(word, table, *, sep='', case_preserve=False):
+    out = []
+    for c in word:
+        mapped = table.get(c.lower())
+        if mapped is None:
+            out.append(c)
+        elif case_preserve and c.isupper():
+            out.append(mapped.upper())
+        else:
+            out.append(mapped)
+    return sep.join(out)
+
+def _alternating_apply(word, fns, sep=''):
+    """Cycle fns[i % len(fns)] across the input characters."""
+    return sep.join(fns[i % len(fns)](c) for i, c in enumerate(word))
+
+def _index_lookup(word, table, *, sep=' ', base=97, size=26):
+    """Replace each char with table[ord(c.lower()) - base] when in range."""
+    out = []
+    for c in word:
+        idx = ord(c.lower()) - base
+        out.append(table[idx] if 0 <= idx < size else c)
+    return sep.join(out)
+
+_LEET_MAP_FULL = {**LEET_MAP, **LEET_MAP_HEAVY}
+_LEET_GET = lambda c: LEET_MAP.get(c.lower(), c)
+_UNICODE_GET = lambda c: UNICODE_MAP.get(c.lower(), c)
+
+# ═══════════════════════════════════════════════════════════════════
 # 33 Obfuscation Techniques (3 tiers)
 # ═══════════════════════════════════════════════════════════════════
 
@@ -117,29 +159,15 @@ def _apply_raw(word):
 
 def _apply_leetspeak(word):
     """L33t — basic leetspeak substitution."""
-    return ''.join(LEET_MAP.get(c.lower(), c) for c in word)
+    return _table_lookup(word, LEET_MAP)
 
 def _apply_unicode(word):
     """Unicode — Cyrillic/homoglyph substitution."""
-    result = []
-    for c in word:
-        mapped = UNICODE_MAP.get(c.lower())
-        if mapped:
-            result.append(mapped.upper() if c.isupper() else mapped)
-        else:
-            result.append(c)
-    return ''.join(result)
+    return _table_lookup(word, UNICODE_MAP, case_preserve=True)
 
 def _apply_bubble(word):
     """Bubble — circled letter Unicode characters."""
-    result = []
-    for c in word:
-        code = ord(c.lower())
-        if 97 <= code <= 122:
-            result.append(chr(0x24D0 + code - 97))
-        else:
-            result.append(c)
-    return ''.join(result)
+    return _codepoint_shift(word, lo=97, hi=122, base=0x24D0)
 
 def _apply_spaced(word):
     """Spaced — insert spaces between characters."""
@@ -147,14 +175,7 @@ def _apply_spaced(word):
 
 def _apply_fullwidth(word):
     """Fullwidth — fullwidth Unicode characters."""
-    result = []
-    for c in word:
-        code = ord(c)
-        if 33 <= code <= 126:
-            result.append(chr(code + 0xFEE0))
-        else:
-            result.append(c)
-    return ''.join(result)
+    return _codepoint_shift(word, lo=33, hi=126, base=0xFF01, lowercase=False)
 
 def _apply_zwj(word):
     """ZeroWidth — zero-width joiners between characters."""
@@ -184,15 +205,15 @@ def _apply_reversed(word):
 
 def _apply_superscript(word):
     """Superscript — superscript Unicode characters."""
-    return ''.join(SUPERSCRIPT_MAP.get(c.lower(), c) for c in word)
+    return _table_lookup(word, SUPERSCRIPT_MAP)
 
 def _apply_smallcaps(word):
     """SmallCaps — small capital Unicode characters."""
-    return ''.join(SMALLCAPS_MAP.get(c.lower(), c) for c in word)
+    return _table_lookup(word, SMALLCAPS_MAP)
 
 def _apply_morse(word):
     """Morse — morse code representation."""
-    return ' '.join(MORSE_MAP.get(c.lower(), c) for c in word)
+    return _table_lookup(word, MORSE_MAP, sep=' ')
 
 def _apply_piglatin(word):
     """PigLatin — pig latin transformation."""
@@ -211,25 +232,11 @@ def _apply_brackets(word):
 
 def _apply_mathbold(word):
     """MathBold — mathematical bold Unicode."""
-    result = []
-    for c in word:
-        code = ord(c.lower())
-        if 97 <= code <= 122:
-            result.append(chr(0x1D41A + code - 97))
-        else:
-            result.append(c)
-    return ''.join(result)
+    return _codepoint_shift(word, lo=97, hi=122, base=0x1D41A)
 
 def _apply_mathitalic(word):
     """MathItalic — mathematical italic Unicode."""
-    result = []
-    for c in word:
-        code = ord(c.lower())
-        if 97 <= code <= 122:
-            result.append(chr(0x1D44E + code - 97))
-        else:
-            result.append(c)
-    return ''.join(result)
+    return _codepoint_shift(word, lo=97, hi=122, base=0x1D44E)
 
 def _apply_strikethrough(word):
     """S̶t̶r̶i̶k̶e̶ — strikethrough combining characters."""
@@ -237,7 +244,7 @@ def _apply_strikethrough(word):
 
 def _apply_leetheavy(word):
     """L33t+ — heavy leetspeak with extended map."""
-    return ''.join(LEET_MAP_HEAVY.get(c.lower(), LEET_MAP.get(c.lower(), c)) for c in word)
+    return _table_lookup(word, _LEET_MAP_FULL)
 
 def _apply_hyphenated(word):
     """Hyphen — hyphens between characters."""
@@ -247,14 +254,7 @@ def _apply_hyphenated(word):
 
 def _apply_leetunicode(word):
     """L33t+Uni — alternating leet and unicode."""
-    result = []
-    for i, c in enumerate(word):
-        lower = c.lower()
-        if i % 2 == 0:
-            result.append(LEET_MAP.get(lower, c))
-        else:
-            result.append(UNICODE_MAP.get(lower, c))
-    return ''.join(result)
+    return _alternating_apply(word, [_LEET_GET, _UNICODE_GET])
 
 def _apply_spacedmixed(word):
     """S p A c E d — spaced + alternating case."""
@@ -262,26 +262,15 @@ def _apply_spacedmixed(word):
 
 def _apply_reversedleet(word):
     """Rev+L33t — reversed then leetspeak."""
-    return ''.join(LEET_MAP.get(c.lower(), c) for c in reversed(word))
+    return _table_lookup(word[::-1], LEET_MAP)
 
 def _apply_bubblespaced(word):
     """Bubble+Spaced — bubble text with spaces."""
-    result = []
-    for c in word:
-        code = ord(c.lower())
-        if 97 <= code <= 122:
-            result.append(chr(0x24D0 + code - 97))
-        else:
-            result.append(c)
-    return ' '.join(result)
+    return _codepoint_shift(word, lo=97, hi=122, base=0x24D0, sep=' ')
 
 def _apply_unicodezwj(word):
     """Uni+ZWJ — unicode homoglyphs with zero-width non-joiners."""
-    result = []
-    for c in word:
-        mapped = UNICODE_MAP.get(c.lower())
-        result.append(mapped if mapped else c)
-    return '\u200C'.join(result)
+    return _table_lookup(word, UNICODE_MAP, sep='\u200C')
 
 def _apply_base64hint(word):
     """Base64 — base64 encode the word."""
@@ -296,47 +285,22 @@ def _apply_hexencode(word):
 
 def _apply_acrostic(word):
     """Acrostic — NATO alphabet expansion."""
-    result = []
-    for c in word:
-        idx = ord(c.lower()) - 97
-        if 0 <= idx < 26:
-            result.append(NATO_ALPHABET[idx])
-        else:
-            result.append(c)
-    return ' '.join(result)
+    return _index_lookup(word, NATO_ALPHABET)
 
 def _apply_dottedunicode(word):
     """Dot+Uni — unicode homoglyphs with dots."""
-    result = []
-    for c in word:
-        mapped = UNICODE_MAP.get(c.lower())
-        result.append(mapped if mapped else c)
-    return '.'.join(result)
+    return _table_lookup(word, UNICODE_MAP, sep='.')
 
 def _apply_fullwidthmixed(word):
     """FW MiX — fullwidth + mixed case alternating."""
-    result = []
-    for i, c in enumerate(word):
+    def _fw(c):
         code = ord(c)
-        if i % 2 == 0 and 33 <= code <= 126:
-            result.append(chr(code + 0xFEE0))
-        else:
-            result.append(c.upper() if i % 2 else c)
-    return ''.join(result)
+        return chr(code + 0xFEE0) if 33 <= code <= 126 else c
+    return _alternating_apply(word, [_fw, str.upper])
 
 def _apply_triplelayer(word):
     """Triple — leet + unicode + uppercase rotating with ZWJ."""
-    result = []
-    for i, c in enumerate(word):
-        lower = c.lower()
-        mod = i % 3
-        if mod == 0:
-            result.append(LEET_MAP.get(lower, c))
-        elif mod == 1:
-            result.append(UNICODE_MAP.get(lower, c))
-        else:
-            result.append(c.upper())
-    return '\u200D'.join(result)
+    return _alternating_apply(word, [_LEET_GET, _UNICODE_GET, str.upper], sep='‍')
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -390,37 +354,23 @@ TIER_SIZES = {'light': 11, 'standard': 22, 'heavy': 33}
 # Encoding escalation (for retry logic with GODMODE CLASSIC)
 # ═══════════════════════════════════════════════════════════════════
 
+_MORSE_MAP_WITH_SPACE = {**MORSE_MAP, ' ': '/'}
+
 def to_braille(text):
     """Convert text to braille Unicode characters."""
-    return ''.join(BRAILLE_MAP.get(c.lower(), c) for c in text)
+    return _table_lookup(text, BRAILLE_MAP)
 
 def to_leetspeak(text):
     """Convert text to leetspeak."""
-    return ''.join(LEET_MAP.get(c.lower(), c) for c in text)
+    return _table_lookup(text, LEET_MAP)
 
 def to_bubble(text):
     """Convert text to bubble/circled text."""
-    circled = 'ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ'
-    result = []
-    for c in text:
-        idx = ord(c.lower()) - 97
-        if 0 <= idx < 26:
-            result.append(circled[idx])
-        else:
-            result.append(c)
-    return ''.join(result)
+    return _codepoint_shift(text, lo=97, hi=122, base=0x24D0)
 
 def to_morse(text):
     """Convert text to Morse code."""
-    morse = {
-        'a': '.-', 'b': '-...', 'c': '-.-.', 'd': '-..', 'e': '.',
-        'f': '..-.', 'g': '--.', 'h': '....', 'i': '..', 'j': '.---',
-        'k': '-.-', 'l': '.-..', 'm': '--', 'n': '-.', 'o': '---',
-        'p': '.--.', 'q': '--.-', 'r': '.-.', 's': '...', 't': '-',
-        'u': '..-', 'v': '...-', 'w': '.--', 'x': '-..-', 'y': '-.--',
-        'z': '--..', ' ': '/',
-    }
-    return ' '.join(morse.get(c.lower(), c) for c in text)
+    return _table_lookup(text, _MORSE_MAP_WITH_SPACE, sep=' ')
 
 ENCODING_ESCALATION = [
     {'name': 'plain',     'label': 'PLAIN',   'fn': lambda q: q},
