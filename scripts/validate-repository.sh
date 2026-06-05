@@ -14,5 +14,7 @@ find scripts -type f -name '*.sh' -print | sort | while IFS= read -r script; do
   bash -n "${script}"
 done
 
+uv run ruff format --check scripts hooks
+uv run ruff check scripts hooks
 uv run python -m py_compile hooks/update-nickname/handler.py scripts/validate-repository.py
 uv run python scripts/validate-repository.py

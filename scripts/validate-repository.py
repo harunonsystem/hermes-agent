@@ -8,18 +8,12 @@ from pathlib import Path
 
 import yaml
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def _load_json(path: Path) -> None:
+def _parse(path: Path, loader) -> None:
     with path.open(encoding="utf-8") as f:
-        json.load(f)
-
-
-def _load_yaml(path: Path) -> None:
-    with path.open(encoding="utf-8") as f:
-        yaml.safe_load(f)
+        loader(f)
 
 
 def _validate_skill_frontmatter(path: Path) -> None:
@@ -42,14 +36,14 @@ def _validate_skill_frontmatter(path: Path) -> None:
 
 def main() -> None:
     for path in [ROOT / "channel_directory.example.json"]:
-        _load_json(path)
+        _parse(path, json.load)
 
-    yaml_files = [ROOT / "config.yaml"]
+    yaml_files = [ROOT / "config.yaml", ROOT / "lefthook.yml"]
     yaml_files.extend((ROOT / "hooks").glob("**/*.yaml"))
     yaml_files.extend((ROOT / ".github" / "workflows").glob("*.yml"))
     yaml_files.extend((ROOT / ".github" / "workflows").glob("*.yaml"))
     for path in yaml_files:
-        _load_yaml(path)
+        _parse(path, yaml.safe_load)
 
     for path in (ROOT / "skills").glob("**/SKILL.md"):
         _validate_skill_frontmatter(path)
