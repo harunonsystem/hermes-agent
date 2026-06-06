@@ -1,0 +1,12 @@
+pre-commit:
+  piped: true
+  fail_on_changes: never
+  jobs:
+    - name: fix-python
+      glob: "**/*.py"
+      run: bash scripts/fix-repository.sh {staged_files}
+      stage_fixed: true
+
+    - name: validate
+      run: bash scripts/validate-repository.sh
+      fail_text: "validation failed. Auto-fixできない問題が残ってるから手で直して。"
