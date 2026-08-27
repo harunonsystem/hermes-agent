@@ -4083,6 +4083,41 @@ def _launchd_fallback_to_detached(reason: str, *, exit_on_failure: bool = True) 
     return False
 
 
+def _launchd_gateway_wrapper_path() -> Path:
+    return get_hermes_home() / "bin" / "gateway-keychain-launchd.zsh"
+
+
+def _launchd_gateway_wrapper_is_available() -> bool:
+    wrapper = _launchd_gateway_wrapper_path()
+    return wrapper.is_file() and os.access(wrapper, os.X_OK)
+
+
+def _launchd_plist_uses_keychain_wrapper(plist_path: Path) -> bool:
+    """Identify a plist whose process boundary is managed by the local wrapper."""
+    if not _launchd_gateway_wrapper_is_available():
+        return False
+    try:
+        installed = plist_path.read_text(encoding="utf-8")
+    except OSError:
+        return False
+    return str(_launchd_gateway_wrapper_path()) in installed
+
+
+def _launchd_gateway_program_arguments(
+    python_path: str, profile_arg: str
+) -> list[str]:
+    """Use the local Keychain wrapper when one is installed for launchd."""
+    wrapper = _launchd_gateway_wrapper_path()
+    if _launchd_gateway_wrapper_is_available():
+        return ["/bin/zsh", str(wrapper)]
+
+    program_arguments = [python_path, "-m", "hermes_cli.main"]
+    if profile_arg:
+        program_arguments.extend(profile_arg.split())
+    program_arguments.extend(["gateway", "run", "--replace"])
+    return program_arguments
+
+
 def generate_launchd_plist() -> str:
     python_path = get_python_path()
     # Stable cwd anchor — never the volatile source checkout. See
@@ -4111,22 +4146,11 @@ def generate_launchd_plist() -> str:
         )
     )
 
-    # Build ProgramArguments array, including --profile when using a named profile
+    # Build ProgramArguments array, including --profile when using a named profile.
     prog_args = [
-        f"<string>{python_path}</string>",
-        "<string>-m</string>",
-        "<string>hermes_cli.main</string>",
+        f"<string>{part}</string>"
+        for part in _launchd_gateway_program_arguments(python_path, profile_arg)
     ]
-    if profile_arg:
-        for part in profile_arg.split():
-            prog_args.append(f"<string>{part}</string>")
-    prog_args.extend(
-        [
-            "<string>gateway</string>",
-            "<string>run</string>",
-            "<string>--replace</string>",
-        ]
-    )
     prog_args_xml = "\n        ".join(prog_args)
 
     # Persist the configured RLIMIT_NOFILE floor into the service definition
@@ -4222,14 +4246,23 @@ def launchd_plist_is_current() -> bool:
 
 
 def refresh_launchd_plist_if_needed() -> bool:
-    """Rewrite the installed launchd plist when the generated definition has changed.
+    """Rewrite an unmanaged launchd plist when the generated definition changed.
 
     Unlike systemd, launchd picks up plist changes on the next ``launchctl kill``/
     ``launchctl kickstart`` cycle — no daemon-reload is needed. We still bootout/
     bootstrap to make launchd re-read the updated plist immediately.
+
+    A plist that already invokes the local Keychain wrapper is an external
+    service-management boundary (for example, a chezmoi-managed plist). Keep it
+    byte-for-byte intact during the normal ``gateway start`` path; explicit
+    install/reconfiguration commands remain responsible for intentional writes.
     """
     plist_path = get_launchd_plist_path()
-    if not plist_path.exists() or launchd_plist_is_current():
+    if not plist_path.exists():
+        return False
+    if _launchd_plist_uses_keychain_wrapper(plist_path):
+        return False
+    if launchd_plist_is_current():
         return False
 
     new_plist = generate_launchd_plist()

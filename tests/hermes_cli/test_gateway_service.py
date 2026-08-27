@@ -1,6 +1,7 @@
 """Tests for gateway service management helpers."""
 
 import os
+import plistlib
 import subprocess
 from pathlib import Path
 from types import SimpleNamespace
@@ -232,6 +233,20 @@ class TestGeneratedSystemdUnits:
         assert str(local_bin) in plist
         assert str(profile_node_bin) not in plist
 
+    def test_launchd_plist_preserves_existing_keychain_wrapper(self, tmp_path, monkeypatch):
+        hermes_home = tmp_path / ".hermes"
+        wrapper = hermes_home / "bin" / "gateway-keychain-launchd.zsh"
+        wrapper.parent.mkdir(parents=True)
+        wrapper.write_text("#!/bin/zsh\n", encoding="utf-8")
+        wrapper.chmod(0o755)
+
+        monkeypatch.setattr(gateway_cli, "get_hermes_home", lambda: hermes_home)
+        monkeypatch.setenv("HERMES_HOME", str(hermes_home))
+
+        plist = plistlib.loads(gateway_cli.generate_launchd_plist().encode("utf-8"))
+
+        assert plist["ProgramArguments"] == ["/bin/zsh", str(wrapper)]
+
     def test_launchd_plist_persists_configured_nofile_soft_limit(self, monkeypatch):
         """The generated plist must carry SoftResourceLimits/NumberOfFiles so a
         plist rewrite by `hermes gateway start` cannot strip the FD floor and
@@ -316,6 +331,27 @@ class TestLaunchdServiceRecovery:
 
     def test_wait_for_pid_exit_ignores_nonpositive_pid(self):
         assert gateway_cli._wait_for_pid_exit(0, timeout=30) is True
+
+    def test_refresh_preserves_existing_keychain_wrapper_plist(self, tmp_path, monkeypatch):
+        hermes_home = tmp_path / ".hermes"
+        wrapper = hermes_home / "bin" / "gateway-keychain-launchd.zsh"
+        wrapper.parent.mkdir(parents=True)
+        wrapper.write_text("#!/bin/zsh\n", encoding="utf-8")
+        wrapper.chmod(0o755)
+
+        plist_path = tmp_path / "ai.hermes.gateway.plist"
+        original = plistlib.dumps(
+            {"ProgramArguments": ["/bin/zsh", str(wrapper)]}
+        ).decode("utf-8")
+        plist_path.write_text(original, encoding="utf-8")
+
+        monkeypatch.setattr(gateway_cli, "get_hermes_home", lambda: hermes_home)
+        monkeypatch.setattr(gateway_cli, "get_launchd_plist_path", lambda: plist_path)
+        monkeypatch.setattr(gateway_cli, "launchd_plist_is_current", lambda: False)
+        monkeypatch.setattr(gateway_cli, "generate_launchd_plist", lambda: "<plist>new</plist>")
+
+        assert gateway_cli.refresh_launchd_plist_if_needed() is False
+        assert plist_path.read_text(encoding="utf-8") == original
 
 
 
@@ -2034,4 +2070,3 @@ class TestRetryLaunchctlBootstrapUntilRegistered:
         )
         assert ok is False
         assert list_calls["n"] >= 1
-
